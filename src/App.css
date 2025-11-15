@@ -17,6 +17,79 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+body {
+  background: linear-gradient(135deg, #181818 65%, #FFD70011);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+}
+
+.mobile-container {
+  width: 100%;
+  max-width: 430px;
+  min-width: 260px;
+  margin: 0 auto;
+  padding: 0 14px 40px 14px;
+  box-sizing: border-box;
+  background: rgba(30,30,30,0.97);
+  border-radius: 16px;
+  box-shadow: 0 4px 38px #0006;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 90vh;
+}
+
+.titulo-grande {
+  font-family: 'Bebas Neue', 'Poppins', Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #FFD700;
+}
+
+.servicos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+@media (min-width: 700px) {
+  .servicos-grid {
+    grid-template-columns: 1fr 1fr !important;
+    max-width: 680px !important;
+  }
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  justify-items: center;
+  margin: 0 auto;
+  max-width: 340px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 900px) {
+  body {
+    background: linear-gradient(115deg, #181818 61%, #FFD70014 99%);
+  }
+  .mobile-container {
+    max-width: 430px;
+    min-width: 320px;
+    margin-top: 30px;
+    margin-bottom: 35px;
+    min-height: 80vh;
+    padding: 18px 26px 40px 26px;
+    border-radius: 22px;
+    box-shadow: 0 3px 24px #0007;
+  }
+}
+
 
 @keyframes logo-spin {
   from {

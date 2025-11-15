@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BookingProvider } from './context/BookingContext'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Welcome from './pages/Welcome'
+import SelectService from './pages/SelectService'
+import SelectBarber from './pages/SelectBarber'
+import SelectSlot from './pages/SelectSlot'
+import ConfirmBooking from './pages/ConfirmBooking'
+import './App.css'  // Fontes e classes
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BookingProvider>
+      <Router>
+        <div className="mobile-container">
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/servico" element={<SelectService />} />
+            <Route path="/barbeiro" element={<SelectBarber />} />
+            <Route path="/horario" element={<SelectSlot />} />
+            <Route path="/confirmar" element={<ConfirmBooking />} />
+          </Routes>
+        </div>
+      </Router>
+    </BookingProvider>
   )
 }
-
 export default App
