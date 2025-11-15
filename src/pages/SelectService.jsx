@@ -4,6 +4,20 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../utils/supabaseClient'
 import '../App.css'
 
+// SVG tesoura como componente para uso direto
+function ScissorIcon({ size = 32, color = "#3fbdfa", style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24"
+      fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <line x1="20" y1="4" x2="8.12" y2="15.88" />
+      <line x1="14.47" y1="14.48" x2="20" y2="20" />
+      <line x1="8.12" y1="8.12" x2="12" y2="12" />
+    </svg>
+  )
+}
+
 export default function SelectService() {
   const navigate = useNavigate()
   const { setSelectedService } = useBooking()
@@ -11,10 +25,7 @@ export default function SelectService() {
   const [selectedServices, setSelectedServices] = useState([])
 
   useEffect(() => {
-    supabase
-      .from('services')
-      .select('id, name, price')
-      .then(({ data }) => setServices(data))
+    supabase.from('services').select('id, name, price').then(({ data }) => setServices(data))
   }, [])
 
   function toggleService(service) {
@@ -24,105 +35,57 @@ export default function SelectService() {
         : [...prev, service]
     )
   }
-
   function handleContinue() {
     setSelectedService(selectedServices)
     navigate('/barbeiro')
   }
-
-  const total = selectedServices.reduce(
-    (a, s) => a + parseFloat(s.price ?? 0),
-    0
-  )
-
+  const total = selectedServices.reduce((a, s) => a + parseFloat(s.price ?? 0), 0)
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg,#181818 70%,#FFD70022)',
-      padding: '40px 0'
+      padding: '38px 0',
+      width: '100%',
+      background: 'var(--background-main)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center'
     }}>
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 36
+        display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 34
       }}>
-        <img src="/scissor.svg" alt="Tesoura" style={{
-          width: 38,
-          height: 38,
-          marginRight: 12,
-          filter: 'invert(1) brightness(2)' // deixa branco!
-        }} />
-        <h2 className="titulo-grande" style={{ margin: 0 }}>
-          Escolha seus serviços
-        </h2>
+        <ScissorIcon size={34} color="#3fbdfa" style={{ marginRight: 10 }} />
+        <h2 className="titulo-grande" style={{ margin: 0 }}>Escolha seus serviços</h2>
       </div>
-      <div className="servicos-grid">
+      <div className="servicos-grid" style={{ width: '100%', margin: 0 }}>
         {services.map(s => (
           <div
             key={s.id}
-            style={{
-              background: selectedServices.some(sel => sel.id === s.id)
-                ? 'rgba(35,35,35,0.98)'
-                : 'rgba(25,25,25,0.92)',
-              border: selectedServices.some(sel => sel.id === s.id)
-                ? '2px solid #FFD700'
-                : '2px solid transparent',
-              color: '#fff',
-              padding: 18,
-              borderRadius: 14,
-              boxShadow: '0 4px 18px #0003',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              minWidth: 0,
-              cursor: 'pointer'
-            }}
+            className={`card-servico${selectedServices.some(sel => sel.id === s.id) ? ' selecionado' : ''}`}
             onClick={() => toggleService(s)}
           >
-            <img
-              src="/scissor.svg"
-              alt="Serviço"
-              style={{
-                width: 26,
-                marginBottom: 10,
-                filter: 'invert(1) brightness(2)'
-              }}
-            />
+            <ScissorIcon size={22} color={selectedServices.some(sel => sel.id === s.id) ? "#3fbdfa" : "#ffffff"} style={{ marginBottom:10 }}/>
             <div style={{
               fontWeight: 700,
-              fontSize: 17,
+              fontSize: 15,
               marginBottom: 7
             }}>{s.name}</div>
             <div style={{
-              color: '#FFD700',
+              color: 'var(--border-accent)',
               fontWeight: 600,
-              fontSize: 18,
-              marginBottom: 13
+              fontSize: 15,
+              marginBottom: 10
             }}>
               R$ {Number(s.price).toFixed(2)}
             </div>
           </div>
         ))}
       </div>
-      <div style={{
-        marginTop: 38,
-        background: '#222',
-        borderRadius: 10,
-        boxShadow: '0 2px 18px #0003',
-        color: '#fff',
-        padding: '18px 22px',
-        maxWidth: 350,
-        marginLeft: 'auto',
-        marginRight: 'auto'
-      }}>
+      <div className="lista-servicos">
         <div style={{
           fontWeight: 700,
-          fontSize: 17,
-          marginBottom: 8,
-          color: '#FFD700'
+          fontSize: 16,
+          color: 'var(--accent)',
+          marginBottom: 6
         }}>Serviços selecionados:</div>
-        <ul style={{ paddingLeft: 16, marginBottom: 10 }}>
+        <ul>
           {selectedServices.map(s => (
             <li key={s.id} style={{ fontSize: 15 }}>
               {s.name} — R$ {Number(s.price).toFixed(2)}
@@ -132,32 +95,10 @@ export default function SelectService() {
             <li style={{ color: '#888' }}>Nenhum serviço selecionado</li>
           }
         </ul>
-        <div style={{
-          fontWeight: 900,
-          fontSize: 19,
-          textAlign: 'right',
-          color: '#FFD700'
-        }}>
-          Total: R$ {total.toFixed(2)}
-        </div>
+        <div className="total">Total: R$ {total.toFixed(2)}</div>
         <button
           disabled={selectedServices.length === 0}
-          onClick={handleContinue}
-          style={{
-            marginTop: 16,
-            background: selectedServices.length === 0 ? '#bbb' : '#FFD700',
-            color: '#191919',
-            borderRadius: 8,
-            border: 'none',
-            fontSize: 17,
-            fontWeight: 800,
-            padding: '10px 36px',
-            cursor: selectedServices.length === 0 ? 'not-allowed' : 'pointer',
-            boxShadow: '0 2px 8px #0002',
-            width: '100%',
-            maxWidth: 180,
-            transition: 'background 0.2s'
-          }}>
+          onClick={handleContinue}>
           Continuar
         </button>
       </div>

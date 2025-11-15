@@ -1,21 +1,33 @@
 import { useNavigate } from 'react-router-dom'
 import { useBooking } from '../context/BookingContext'
+import '../App.css'
+
+// SVG avatar masculino
+function BarberIcon({ size = 40, color = "#3fbdfa", style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" style={style}>
+      <ellipse cx="16" cy="16" rx="14" ry="13" stroke={color} strokeWidth="2.2" fill="none"/>
+      <ellipse cx="16" cy="16" rx="7.5" ry="8.5" stroke={color} strokeWidth="1.4" fill="none"/>
+      <circle cx="13" cy="16" r="2.1" fill={color}/>
+      <circle cx="19" cy="16" r="2.1" fill={color}/>
+      <path d="M12 21 Q16 26 20 21" stroke={color} strokeWidth="1.8" fill="none"/>
+    </svg>
+  )
+}
 
 const barbers = [
   {
     id: 1,
     name: 'João',
     nickname: 'Navalha de Ouro',
-    avatar: '/barber-joao.svg', // Troque pelo SVG ou JPG na pasta public/
-    specialty: 'Fade, clássico',
+    specialty: 'Fade, clássico'
   },
   {
     id: 2,
     name: 'Lucas',
     nickname: 'Clean Fade',
-    avatar: '/barber-lucas.svg', // Troque pelo SVG ou JPG na pasta public/
-    specialty: 'Moderno, freestyle',
-  },
+    specialty: 'Moderno, freestyle'
+  }
 ]
 
 export default function SelectBarber() {
@@ -30,56 +42,59 @@ export default function SelectBarber() {
   return (
     <div className="mobile-container" style={{
       minHeight: '100vh',
-      background: 'linear-gradient(125deg,#181818 70%,#FFD70011)',
-      padding: '36px 0'
+      paddingTop: 50,
+      background: 'var(--background-main)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
     }}>
-      <h2 style={{
-        fontFamily: 'Bebas Neue, Montserrat, sans-serif',
-        fontSize: 32,
-        color: '#FFD700',
-        textAlign: 'center',
-        marginBottom: 32
-      }}>
-        Escolha seu barbeiro
+      <h2 className="titulo-grande" style={{ marginBottom: 35 }}>
+        Escolha o Barbeiro
       </h2>
       <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 28
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 30,
+        marginBottom: 42,
+        width: '92%'
       }}>
         {barbers.map(b => (
-          <div key={b.id} style={{
-            background: 'rgba(25,25,25,0.97)',
-            color: '#fff',
-            borderRadius: 20,
-            boxShadow: '0 2px 12px #0006',
-            width: '100%',
-            maxWidth: 340,
-            padding: 27,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 18
-          }}>
-            <img src={b.avatar} alt={b.name}
-              style={{ width: 66, height: 66, borderRadius: '50%', background: '#222' }}
-            />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{b.name}</div>
-              <span style={{ fontSize: 15, color: '#FFD700', fontWeight: 500 }}>{b.nickname}</span>
-              <div style={{ fontSize: 14, color: '#DDD' }}>{b.specialty}</div>
+          <div key={b.id}
+            style={{
+              background: 'var(--background-card)',
+              borderRadius: 14,
+              boxShadow: '0 4px 18px #0004',
+              padding: 20,
+              color: 'var(--primary)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              border: `2px solid var(--border-accent)`,
+              transition: 'background 0.18s'
+            }}
+            onClick={() => handleSelect(b)}
+          >
+            <BarberIcon size={47} color="#3fbdfa" style={{ marginBottom: 10 }}/>
+            <div style={{ fontWeight: 700, fontSize: 20 }}>{b.name}</div>
+            <div style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 14, marginBottom: 3 }}>
+              {b.nickname}
             </div>
-            <button onClick={() => handleSelect(b)}
-              style={{
-                background: '#FFD700',
-                color: '#191919',
-                borderRadius: 7,
-                border: 'none',
-                fontSize: 16,
-                fontWeight: 700,
-                padding: '9px 18px',
-                cursor: 'pointer'
-              }}>
+            <div style={{ fontSize: 13, color: 'var(--secondary)', fontWeight: 600 }}>
+              {b.specialty}
+            </div>
+            <button style={{
+              background: 'var(--accent)',
+              color: '#fff',
+              marginTop: 15,
+              border: 'none',
+              fontWeight: 700,
+              fontSize: 16,
+              borderRadius: 7,
+              padding: '8px 18px',
+              boxShadow: '0 1px 10px #071c28',
+              cursor: 'pointer'
+            }}>
               Selecionar
             </button>
           </div>

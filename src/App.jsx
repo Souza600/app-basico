@@ -5,7 +5,7 @@ import SelectService from './pages/SelectService'
 import SelectBarber from './pages/SelectBarber'
 import SelectSlot from './pages/SelectSlot'
 import ConfirmBooking from './pages/ConfirmBooking'
-import './App.css'  // Fontes e classes
+import './App.css'
 
 function App() {
   return (
@@ -24,4 +24,5 @@ function App() {
     </BookingProvider>
   )
 }
+
 export default App

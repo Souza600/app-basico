@@ -4,31 +4,21 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabaseClient'
 import '../App.css'
 
-function gerarSlotsDoDia(dataStr) {
-  const slots = []
-  for (let hora = 8; hora < 12; hora++) {
-    slots.push(`${hora.toString().padStart(2, '0')}:00`)
-    slots.push(`${hora.toString().padStart(2, '0')}:30`)
-  }
-  slots.push('12:00')
-  for (let hora = 13; hora < 21; hora++) {
-    if (hora === 13) slots.push('13:30');
-    else {
-      slots.push(`${hora.toString().padStart(2, '0')}:00`)
-      slots.push(`${hora.toString().padStart(2, '0')}:30`)
-    }
-  }
-  slots.push('21:00');
-  return slots.map(horario => `${dataStr}T${horario}:00`)
+const BARBER_WHATS = {
+  'João': '5599999999999',
+  'Lucas': '5588888888888'
 }
 
 export default function SelectSlot() {
-  const { selectedService, selectedBarber, setSelectedDatetime, name, setName, contact, setContact } = useBooking()
+  const {
+    selectedService, selectedBarber, setSelectedDatetime,
+    name, setName
+  } = useBooking()
   const [data, setData] = useState(() => new Date().toISOString().split('T')[0])
   const [bookedSlots, setBookedSlots] = useState([])
   const [loading, setLoading] = useState(false)
+  const [slotEscolhido, setSlotEscolhido] = useState('')
   const [message, setMessage] = useState('')
-  const navigate = useNavigate()
 
   useEffect(() => {
     setLoading(true)
@@ -41,6 +31,8 @@ export default function SelectSlot() {
         setBookedSlots(agendados ? agendados.map(a => a.datetime.slice(0,16)) : [])
         setLoading(false)
       })
+    setSlotEscolhido('')
+    setMessage('')
   }, [data, selectedBarber])
 
   if (!selectedService || !selectedBarber) {
@@ -51,71 +43,140 @@ export default function SelectSlot() {
     )
   }
 
+  function gerarSlotsDoDia(dataStr) {
+    const slots = []
+    for (let hora = 8; hora < 12; hora++) {
+      slots.push(`${hora.toString().padStart(2, '0')}:00`)
+      slots.push(`${hora.toString().padStart(2, '0')}:30`)
+    }
+    slots.push('12:00')
+    for (let hora = 13; hora < 21; hora++) {
+      if (hora === 13) slots.push('13:30');
+      else {
+        slots.push(`${hora.toString().padStart(2, '0')}:00`)
+        slots.push(`${hora.toString().padStart(2, '0')}:30`)
+      }
+    }
+    slots.push('21:00')
+    return slots.map(horario => `${dataStr}T${horario}:00`)
+  }
+
   const slots = gerarSlotsDoDia(data)
   const slotsLivres = slots.filter(slot => !bookedSlots.includes(slot))
 
-  function handleAgendar(slot) {
-    if (!name || !contact) {
-      setMessage('Preencha nome e contato')
+  function handleConfirmar() {
+    if (!name) {
+      setMessage('Preencha seu nome')
       return
     }
-    setSelectedDatetime(slot)
-    navigate('/confirmar')
+    if (!slotEscolhido) {
+      setMessage('Selecione um horário')
+      return
+    }
+    setSelectedDatetime(slotEscolhido)
+    const phone = BARBER_WHATS[selectedBarber] || ''
+    const infoServico = Array.isArray(selectedService)
+      ? selectedService.map(s => s.name).join(', ')
+      : (selectedService?.name || '')
+    const texto = `Olá, gostaria de agendar ${infoServico} com ${selectedBarber} no dia ${new Date(slotEscolhido).toLocaleString()} - Nome: ${name}`
+    window.location.href = `https://wa.me/${phone}?text=${encodeURIComponent(texto)}`
   }
 
   return (
     <div className="mobile-container" style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg,#181818 65%,#FFD70011)',
-      paddingTop: 28
+      minHeight: '100vh', background: 'var(--background-main)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center'
     }}>
-      <h2 className="titulo-grande" style={{ marginBottom: 18 }}>
+      <h2 className="titulo-grande" style={{ marginBottom: 16 }}>
         Escolha seu horário
       </h2>
-      <div style={{ textAlign:'center', marginBottom:14 }}>
-        <label style={{ color:'#FFD700', fontWeight:600, fontSize:15 }}>
+      <div style={{ textAlign:'center', marginBottom:10 }}>
+        <label style={{ color:'var(--accent)', fontWeight:600, fontSize:15 }}>
           Data:
           <input type="date" value={data}
             onChange={e => setData(e.target.value)}
             style={{
               marginLeft:13, padding:6, borderRadius:6,
-              border:'1px solid #FFD700', color:'#181818', fontWeight:700
+              border:'1.5px solid var(--accent)', color:'#181818', fontWeight:700
             }}/>
         </label>
       </div>
-      <div style={{ textAlign:'center', marginBottom:16 }}>
-        <input placeholder="Seu nome" value={name} onChange={e => setName(e.target.value)}
-          style={{
-            padding:9, margin:4, border:'none', borderRadius:7,
-            width:'90%', maxWidth:360, marginBottom:5
-          }} />
-        <input placeholder="Telefone ou e-mail" value={contact} onChange={e => setContact(e.target.value)}
-          style={{
-            padding:9, margin:4, border:'none', borderRadius:7,
-            width:'90%', maxWidth:360
-          }} />
-      </div>
-      {loading
-        ? <p style={{textAlign:'center', color:'#FFD700'}}>Carregando horários...</p>
-        : slotsLivres.length === 0
-          ? <div style={{ color:'#FFD700', textAlign:'center', fontWeight:600 }}>Nenhum horário disponível para este dia.</div>
-          : <div className="horarios-grid">
+      {!loading ? (
+        slotsLivres.length === 0 ? (
+          <div style={{ color:'var(--accent)', textAlign:'center', fontWeight:600 }}>Nenhum horário disponível para este dia.</div>
+        ) : (
+          <div>
+            <div
+              className="horarios-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 7,
+                maxWidth: 500,
+                margin: '0 auto 18px auto'
+              }}
+            >
               {slotsLivres.map(slot =>
-                <button key={slot}
-                  onClick={() => handleAgendar(slot)}
+                <button
+                  key={slot}
+                  onClick={() => setSlotEscolhido(slot)}
+                  className="btn-horario"
                   style={{
-                    background:'#FFD700', color:'#191919', border:'none',
-                    borderRadius:8, padding:'14px 0',
-                    fontWeight:700, fontSize:15,
-                    boxShadow:'0 2px 10px #0001',
-                    width:'70px', minHeight:'42px', margin:0
-                  }}>
+                    background: slotEscolhido === slot ? 'var(--border-accent)' : 'var(--accent)',
+                    color: '#232d48',
+                    border: slotEscolhido === slot ? '2px solid #172534' : 'none',
+                    fontWeight: 800,
+                    fontSize: 14,
+                    borderRadius: 8,
+                    minWidth: 0,
+                    maxWidth: 80,
+                    minHeight: 31,
+                    padding: 0,
+                    transition: 'background 0.18s, border 0.18s'
+                  }}
+                >
                   {new Date(slot).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </button>
               )}
             </div>
-      }
-      {message && <p style={{ color: 'red', textAlign:'center', marginTop:10 }}>{message}</p>}
+            <div style={{
+              width: '100%',
+              maxWidth: 370,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              margin: '18px 0'
+            }}>
+              <input
+                placeholder="Seu nome"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                style={{ padding: 9, margin: 4, borderRadius:7, width: '95%', maxWidth: 320 }}
+              />
+              <button
+                onClick={handleConfirmar}
+                style={{
+                  marginTop: 13,
+                  background: 'var(--border-accent)',
+                  color: '#191919',
+                  borderRadius: 8,
+                  border: 'none',
+                  fontSize: 18, fontWeight: 800, padding: '9px 30px',
+                  cursor: 'pointer', boxShadow: '0 2px 8px #0002'
+                }}>
+                Confirmar agendamento
+              </button>
+              {message && (
+                <p style={{ color: 'red', textAlign: 'center', marginTop: 9 }}>
+                  {message}
+                </p>
+              )}
+            </div>
+          </div>
+        )
+      ) : (
+        <p style={{textAlign:'center', color:'var(--accent)'}}>Carregando horários...</p>
+      )}
     </div>
   )
 }
