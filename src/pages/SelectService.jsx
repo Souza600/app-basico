@@ -54,24 +54,48 @@ export default function SelectService() {
         <ScissorIcon size={34} color="#3fbdfa" style={{ marginRight: 10 }} />
         <h2 className="titulo-grande" style={{ margin: 0 }}>Escolha seus serviços</h2>
       </div>
-      <div className="servicos-grid" style={{ width: '100%', margin: 0 }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 16,
+        width: '92%',
+        margin: '0 auto',
+        maxWidth: 500,
+        marginBottom: 32
+      }}>
         {services.map(s => (
           <div
             key={s.id}
             className={`card-servico${selectedServices.some(sel => sel.id === s.id) ? ' selecionado' : ''}`}
             onClick={() => toggleService(s)}
+            style={{
+              background: 'var(--background-card)',
+              color: 'var(--primary)',
+              border: selectedServices.some(sel => sel.id === s.id)
+                ? '2px solid var(--border-accent)'
+                : '2px solid transparent',
+              borderRadius: 14,
+              boxShadow: '0 2px 14px #162337',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: 14,
+              cursor: 'pointer',
+              transition: 'border 0.2s, background 0.15s'
+            }}
           >
-            <ScissorIcon size={22} color={selectedServices.some(sel => sel.id === s.id) ? "#3fbdfa" : "#ffffff"} style={{ marginBottom:10 }}/>
+            <ScissorIcon size={20} color={selectedServices.some(sel => sel.id === s.id) ? "#3fbdfa" : "#ffffff"} style={{ marginBottom:10 }}/>
             <div style={{
               fontWeight: 700,
-              fontSize: 15,
-              marginBottom: 7
+              fontSize: 14,
+              marginBottom: 6,
+              textAlign: 'center'
             }}>{s.name}</div>
             <div style={{
               color: 'var(--border-accent)',
               fontWeight: 600,
-              fontSize: 15,
-              marginBottom: 10
+              fontSize: 14,
+              marginBottom: 8
             }}>
               R$ {Number(s.price).toFixed(2)}
             </div>
